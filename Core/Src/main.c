@@ -122,10 +122,26 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  if (usbRxFlag) {
 		  // Do the uart sending here
+		  HAL_StatusTypeDef ret;
+		  USBD_StatusTypeDef usbret;
+		  uint8_t uart_buffer[20];
+		  ret = HAL_UART_Transmit(&huart2, usbRxBuf, usbRxBufLen, 300); // assumedly the timeout is 100ms, not us or s.
+		  if(ret != HAL_OK) {
+			  printf("HAL Transmit Failed %d", ret);
+		  }
 
-
+		  ret = HAL_UART_Receive(&huart2, uart_buffer, sizeof(uart_buffer), 300); // same as above for timeout, unsure amount of data that should be read.
+		  if(ret != HAL_OK) {
+			  printf("HAL Rec Failed %d", ret);
+		  }
 		  // Transmit the resp back to the laptop
-		  CDC_Transmit_FS(usbTxBuf, usbTxBufLen);
+		  usbTxBufLen = sizeof(uart_buffer);
+		  memcpy(usbTxBuf, uart_buffer, usbTxBufLen);
+
+		  usbret = CDC_Transmit_FS(usbTxBuf, usbTxBufLen);
+		  if(usbret != USBD_OK) {
+			  printf("CDC_Transmit Failed %d", usbret);
+		  }
 		  usbRxFlag = 0;
 		  usbRxBufLen = 0;
 	  }
