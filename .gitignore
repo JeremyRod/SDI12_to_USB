@@ -34,6 +34,11 @@
 .project
 .settings/
 
+# Build Folders 
+Debug/*
+Debug_SWIO/*
+Release/*
+
 # Vagrant directory
 .vagrant/
 
